@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MNotesTheme {
-
+                Text("Hello")
             }
         }
     }

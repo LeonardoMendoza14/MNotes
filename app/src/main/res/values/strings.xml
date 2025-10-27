@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">MNotes</string>
+    <string name="login_message">Inicia sesión para continuar</string>
+    <string name="login_emailField">Ingresa tu usuario</string>
+    <string name="login_userLabel">User</string>
+    <string name="login_passwordLabel">Contraseña</string>
+    <string name="login_userPlaceholder">Ingresa tu usuario</string>
+    <string name="login_passwordPlaceholder">Ingresa tu contraseña</string>
+    <string name="login_googleButton">Continuar con Google</string>
+    <string name="login_or">O</string>
+    <string name="login_loginButton">Iniciar sesión</string>
+    <string name="login_newAccount">Registrate</string>
+    <string name="login_noHaveAccount">¿No tienes cuenta?</string>
+    <string name="login_emailErrorMessage">Usuario no valido</string>
+    <string name="login_passwordErrorMessage">Contraseña no valida</string>
+    <string name="login_loginUnknowErrorMessage">Error al iniciar sesion</string>
 </resources>

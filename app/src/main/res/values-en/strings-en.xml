@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MNotes</string>
+    <string name="login_emailErrorMessage">User is not valid</string>
+    <string name="login_passwordErrorMessage">Password is not valid</string>
 </resources>

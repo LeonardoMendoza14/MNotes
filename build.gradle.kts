@@ -5,4 +5,6 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services) apply false
+    alias(libs.plugins.firebase.crash) version "3.0.6" apply false
 }

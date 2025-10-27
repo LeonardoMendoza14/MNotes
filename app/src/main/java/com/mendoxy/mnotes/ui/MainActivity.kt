@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.mendoxy.mnotes.ui.presentation.login.LoginScreen
 import com.mendoxy.mnotes.ui.theme.MNotesTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,7 +22,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MNotesTheme {
-                Text("Hello")
+                LoginScreen()
             }
         }
     }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "160311762067",
+    "project_id": "mnotes-f1dd4",
+    "storage_bucket": "mnotes-f1dd4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:160311762067:android:9d52a573a57ea41ea60166",
+        "android_client_info": {
+          "package_name": "com.mendoxy.mnotes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7b9JEzODufzjt5YpD-kpG2ugT6bE6CCs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

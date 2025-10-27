@@ -5,6 +5,9 @@ import androidx.compose.ui.unit.dp
 
 val dimenSmall: Dp = 4.dp
 val dimenMiddle: Dp = 8.dp
-val dimenLarge: Dp = 18.dp
+val dimenBig: Dp = 12.dp
+val dimenLarge: Dp = 16.dp
 val dimenExtraLarge: Dp = 24.dp
 val dimenHuge: Dp = 32.dp
+val dimenMinDefault: Dp = 56.dp
+val dimenButton: Dp = 36.dp

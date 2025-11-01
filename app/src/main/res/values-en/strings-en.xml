@@ -3,4 +3,5 @@
     <string name="app_name">MNotes</string>
     <string name="login_emailErrorMessage">User is not valid</string>
     <string name="login_passwordErrorMessage">Password is not valid</string>
+    <string name="default_web_client_id">birarmq4ndbsb8hd424qmvligc4panot.apps.googleusercontent.com</string>
 </resources>

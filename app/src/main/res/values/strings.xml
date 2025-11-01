@@ -13,5 +13,6 @@
     <string name="login_noHaveAccount">¿No tienes cuenta?</string>
     <string name="login_emailErrorMessage">Usuario no valido</string>
     <string name="login_passwordErrorMessage">Contraseña no valida</string>
-    <string name="login_loginUnknowErrorMessage">Error al iniciar sesion</string>
+    <string name="login_loginUnknowErrorMessage">Usuario o contraseña no encontrado</string>
+    <string name="default_web_client_id">160311762067-birarmq4ndbsb8hd424qmvligc4panot.apps.googleusercontent.com</string>
 </resources>

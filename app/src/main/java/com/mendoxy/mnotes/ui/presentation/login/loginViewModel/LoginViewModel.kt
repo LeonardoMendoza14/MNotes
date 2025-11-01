@@ -3,6 +3,7 @@ package com.mendoxy.mnotes.ui.presentation.login.loginViewModel
 import android.util.Log
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.mendoxy.mnotes.R
 import com.mendoxy.mnotes.domain.useCase.LoginUseCase
 import com.mendoxy.mnotes.ui.utils.LoginErrorType
@@ -10,6 +11,7 @@ import com.mendoxy.mnotes.ui.utils.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -51,44 +53,43 @@ class LoginViewModel @Inject constructor(
         _loginState.update{state ->
             state.copy(loginState = UIState.Loading)
         }
-
-        // Email validation
-        if(_loginState.value.email.isNotEmpty() && !loginUseCase.isValidEmail(_loginState.value.email)){
-            _loginState.update { state ->
-                state.copy(loginState = UIState.Error(error = LoginErrorType.INVALID_EMAIL))
-            }
-            return
-        }else{
-            _loginState.update { state ->
-                state.copy(loginState = UIState.Idle)
-            }
-        }
-
-        // password validation
-        if(_loginState.value.password.isNotEmpty() && !loginUseCase.isValidPassword(_loginState.value.password)){
-            _loginState.update { state ->
-                state.copy(loginState = UIState.Error(error = LoginErrorType.INVALID_PASSWORD))
-            }
-            return
-        }else{
-            _loginState.update { state ->
-                state.copy(loginState = UIState.Idle)
+        viewModelScope.launch {
+            val loginResult = loginUseCase.login(_loginState.value.email, _loginState.value.password)
+            when(loginResult){
+                LoginErrorType.NONE -> {
+                    _loginState.update { state ->
+                        state.copy(loginState = UIState.Success(Unit))
+                     }
+                }
+                else -> {
+                    _loginState.update { state ->
+                        state.copy(loginState = UIState.Error(loginResult))
+                    }
+                }
             }
         }
+    }
 
-        // Login
+    fun loginWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            _loginState.update {state ->
+                state.copy(loginState = UIState.Loading)
+            }
 
-        /*
-        Implementar lo que ya tengo del viewModel en el loginScreen
-        Hacer el mensaje de error en el loginScreen
-        integrar el repository para el login con contraseña y correo, asi como validar si ya esta iniciada la sesion
-        Agregar la validacion de sesion en mainActivity para saltarse el login
-        Agregar la logica al useCase para iniciar sesion con correo y contraseña
-        Agregar validaciones al viewModel con respuestas
-         */
-
-
-
+            val result = loginUseCase.loginWithGoogle(idToken)
+            when(result){
+                LoginErrorType.NONE -> {
+                    _loginState.update { state ->
+                        state.copy(loginState = UIState.Success(Unit))
+                    }
+                }
+                else -> {
+                    _loginState.update { state ->
+                        state.copy(loginState = UIState.Error(result))
+                    }
+                }
+            }
+        }
     }
 
 }

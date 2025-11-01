@@ -12,7 +12,20 @@
           "package_name": "com.mendoxy.mnotes"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "160311762067-12dddegbm9ch9qrpv1cusalpbch17nvt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mendoxy.mnotes",
+            "certificate_hash": "a7389ba3252de442958a2353e7ed91e99cf47b31"
+          }
+        },
+        {
+          "client_id": "160311762067-birarmq4ndbsb8hd424qmvligc4panot.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD7b9JEzODufzjt5YpD-kpG2ugT6bE6CCs"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "160311762067-birarmq4ndbsb8hd424qmvligc4panot.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

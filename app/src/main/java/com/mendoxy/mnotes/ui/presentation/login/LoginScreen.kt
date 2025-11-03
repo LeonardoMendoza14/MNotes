@@ -63,9 +63,12 @@ import com.mendoxy.mnotes.ui.theme.dimenMiddle
 import com.mendoxy.mnotes.ui.theme.dimenMinDefault
 import com.mendoxy.mnotes.ui.theme.dimenSmall
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.mendoxy.mnotes.navigation.AppRoutes
 import com.mendoxy.mnotes.ui.presentation.components.ErrorMessageCard
 import com.mendoxy.mnotes.ui.utils.LoginErrorType
 import com.mendoxy.mnotes.ui.utils.LoginUiState
@@ -74,6 +77,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
+    navController: NavHostController,
     vm: LoginViewModel = hiltViewModel()
 ) {
     val state: LoginUiState by vm.loginState.collectAsState()
@@ -103,7 +107,7 @@ fun LoginScreen(
 //    }
 
     if(state.loginState is UIState.Success){
-        // Navegar a la pantalla principal
+        navController.navigate(route = AppRoutes.Login.route)
     }
 
     Box(
@@ -271,7 +275,7 @@ fun LoginScreen(
             DefaultText(
                 modifier = Modifier
                     .clickable {
-
+                        navController.navigate(AppRoutes.Register.route)
                     },
                 text = stringResource(R.string.login_newAccount),
                 color = MaterialTheme.colorScheme.primary,
@@ -344,6 +348,6 @@ fun LoginScreen(
 @Composable
 fun PreviewLogin() {
     MNotesTheme {
-        LoginScreen()
+        LoginScreen(rememberNavController())
     }
 }

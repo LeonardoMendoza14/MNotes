@@ -27,32 +27,16 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private var isLogged: Boolean = false
     lateinit var navController: NavHostController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        validateLogged()
         setContent {
             navController = rememberNavController()
             MNotesTheme {
-                if(isLogged){
-                    AppNavigation(navController)
-                }else {
-                    navController.navigate(AppRoutes.Login.route){
-                        popUpTo(AppRoutes.Login.route){
-                            inclusive = true
-                        }
-                    }
-                }
+                AppNavigation(navController)
             }
-        }
-    }
-
-    private fun validateLogged(){
-        if(FirebaseAuth.getInstance().currentUser != null){
-            isLogged = true
         }
     }
 }

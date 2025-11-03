@@ -63,6 +63,8 @@ import com.mendoxy.mnotes.ui.theme.dimenMiddle
 import com.mendoxy.mnotes.ui.theme.dimenMinDefault
 import com.mendoxy.mnotes.ui.theme.dimenSmall
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -75,6 +77,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun RegisterScreen(
+    navController: NavHostController,
     vm: RegisterViewModel = hiltViewModel()
 ) {
     val state: LoginUiState by vm.registerState.collectAsState()
@@ -317,6 +320,6 @@ fun RegisterScreen(
 @Composable
 fun PreviewLogin() {
     MNotesTheme {
-        RegisterScreen()
+        RegisterScreen(rememberNavController())
     }
 }

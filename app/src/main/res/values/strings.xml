@@ -15,4 +15,12 @@
     <string name="login_passwordErrorMessage">Contraseña no valida</string>
     <string name="login_loginUnknowErrorMessage">Usuario o contraseña no encontrado</string>
     <string name="default_web_client_id">160311762067-birarmq4ndbsb8hd424qmvligc4panot.apps.googleusercontent.com</string>
+    <string name="register_message">Registrate para continuar</string>
+    <string name="register_confirmPasswordLabel">Confirmar contraseña</string>
+    <string name="register_confirmPasswordPlaceholder">Vuelve a escribir tu contraseña</string>
+    <string name="register_registerButton">Crear usuario</string>
+    <string name="register_alreadyAccount">Inicia sesion</string>
+    <string name="register_youHaveAccount">¿Ya tienes cuenta?</string>
+    <string name="register_passwordNotMatching">Las contraseñas no coinciden</string>
+    <string name="register_registerUnknowErrorMessage">Tuvimos problemas para crear tu cuenta</string>
 </resources>

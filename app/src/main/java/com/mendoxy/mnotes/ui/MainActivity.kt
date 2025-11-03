@@ -15,7 +15,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.mendoxy.mnotes.navigation.AppNavigation
+import com.mendoxy.mnotes.navigation.AppRoutes
 import com.mendoxy.mnotes.ui.presentation.login.LoginScreen
 import com.mendoxy.mnotes.ui.presentation.mainScreen.home.HomeScreen
 import com.mendoxy.mnotes.ui.theme.MNotesTheme
@@ -24,17 +28,23 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private var isLogged: Boolean = false
+    lateinit var navController: NavHostController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         validateLogged()
         setContent {
+            navController = rememberNavController()
             MNotesTheme {
                 if(isLogged){
-                    HomeScreen()
+                    AppNavigation(navController)
                 }else {
-                    LoginScreen()
+                    navController.navigate(AppRoutes.Login.route){
+                        popUpTo(AppRoutes.Login.route){
+                            inclusive = true
+                        }
+                    }
                 }
             }
         }

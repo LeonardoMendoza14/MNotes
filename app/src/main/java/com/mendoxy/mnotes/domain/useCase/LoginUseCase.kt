@@ -24,6 +24,10 @@ class LoginUseCase @Inject constructor(
         return value.trim().isNotEmpty()
     }
 
+    fun passwordMatch(password: String, confirm: String): Boolean{
+        return password == confirm
+    }
+
     suspend fun login(email: String, password: String): LoginErrorType  {
         // Email validation
         if(!isNotEmpty(email) || !isValidEmail(email)){
@@ -38,6 +42,37 @@ class LoginUseCase @Inject constructor(
         try{
 
             val result = loginRepository.loginWithEmail(email, password)
+            if(result.isFailure){
+                return LoginErrorType.INVALID_lOGIN
+            }else{
+                return LoginErrorType.NONE
+            }
+
+        }catch(e: Exception){
+            return LoginErrorType.INVALID_lOGIN
+
+        }
+    }
+
+    suspend fun createUser(email: String, password: String, confirm: String): LoginErrorType  {
+        // Email validation
+        if(!isNotEmpty(email) || !isValidEmail(email)){
+            return LoginErrorType.INVALID_EMAIL
+        }
+
+        // password validation
+        if(!isNotEmpty(password) || !isValidPassword(password)){
+            return LoginErrorType.INVALID_PASSWORD
+        }
+
+        // password matching
+        if(!isNotEmpty(confirm) || !passwordMatch(password, confirm)){
+            return LoginErrorType.PASSWORD_NOT_MATCH
+        }
+
+        try{
+
+            val result = loginRepository.registerWithEmail(email, password)
             if(result.isFailure){
                 return LoginErrorType.INVALID_lOGIN
             }else{

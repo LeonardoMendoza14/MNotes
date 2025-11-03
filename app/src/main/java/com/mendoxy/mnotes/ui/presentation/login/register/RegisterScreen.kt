@@ -1,4 +1,4 @@
-package com.mendoxy.mnotes.ui.presentation.login
+package com.mendoxy.mnotes.ui.presentation.login.register
 
 import android.graphics.Paint
 import android.util.Log
@@ -67,16 +67,18 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.mendoxy.mnotes.ui.presentation.components.ErrorMessageCard
+import com.mendoxy.mnotes.ui.presentation.login.register.registerViewModel.RegisterViewModel
 import com.mendoxy.mnotes.ui.utils.LoginErrorType
 import com.mendoxy.mnotes.ui.utils.LoginUiState
 import com.mendoxy.mnotes.ui.utils.UIState
 import kotlinx.coroutines.delay
 
 @Composable
-fun LoginScreen(
-    vm: LoginViewModel = hiltViewModel()
+fun RegisterScreen(
+    vm: RegisterViewModel = hiltViewModel()
 ) {
-    val state: LoginUiState by vm.loginState.collectAsState()
+    val state: LoginUiState by vm.registerState.collectAsState()
+    val confirmPassword by vm.confirmPassword
     val showError = state.loginState is UIState.Error
     val context = LocalContext.current
 
@@ -127,70 +129,9 @@ fun LoginScreen(
             Spacer(Modifier.height(dimenMiddle))
 
             DefaultText(
-                text = stringResource(R.string.login_message),
+                text = stringResource(R.string.register_message),
                 color = MaterialTheme.colorScheme.secondary
             )
-
-            Spacer(Modifier.height(dimenLarge))
-
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .clickable {
-//                        val signInIntent = googleSignInClient.signInIntent
-//                        launcher.launch(signInIntent)
-                    }
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .fillMaxWidth()
-                    .height(dimenMinDefault)
-                    .background(
-                        color = MaterialTheme.colorScheme.surface,
-                        shape = MaterialTheme.shapes.small
-                    )
-            ) {
-
-                DefaultText(
-                    text = stringResource(R.string.login_googleButton),
-                    color = MaterialTheme.colorScheme.primary,
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_google),
-                            contentDescription = "",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                )
-            }
-
-            Spacer(Modifier.height(dimenExtraLarge))
-
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
-                )
-
-                DefaultText(
-                    text = stringResource(R.string.login_or),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier
-                        .padding(horizontal = dimenMiddle)
-                )
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
-                )
-            }
 
             Spacer(Modifier.height(dimenExtraLarge))
 
@@ -234,7 +175,37 @@ fun LoginScreen(
                         contentDescription = "",
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.clickable {
-                           vm.setShowPassword()
+                            vm.setShowPassword()
+                        }
+                    )
+                }
+            )
+
+            Spacer(Modifier.height(dimenLarge))
+
+            LoginTextField(
+                value = confirmPassword,
+                onValueChange = {
+                    vm.setConfirmPassword(it)
+                },
+                label = stringResource(R.string.register_confirmPasswordLabel),
+                placeholder = stringResource(R.string.register_confirmPasswordPlaceholder),
+                isPassword = true,
+                showPassword = state.showPassword,
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_password),
+                        contentDescription = "",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(if(!state.showPassword) R.drawable.ic_visibilityon else R.drawable.ic_visibilityoff),
+                        contentDescription = "",
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.clickable {
+                            vm.setShowPassword()
                         }
                     )
                 }
@@ -244,8 +215,7 @@ fun LoginScreen(
 
             Button(
                 onClick = {
-                    vm.login()
-                    Log.e("Debug", showError.toString())
+                    vm.register()
                     Log.e("Debug", state.loginState.toString())
                 },
                 modifier = Modifier
@@ -255,7 +225,7 @@ fun LoginScreen(
             ) {
                 if(state.loginState != UIState.Loading) {
                     DefaultText(
-                        text = stringResource(R.string.login_loginButton),
+                        text = stringResource(R.string.register_registerButton),
                         color = MaterialTheme.colorScheme.background,
                     )
                 }else{
@@ -273,12 +243,12 @@ fun LoginScreen(
                     .clickable {
 
                     },
-                text = stringResource(R.string.login_newAccount),
+                text = stringResource(R.string.register_alreadyAccount),
                 color = MaterialTheme.colorScheme.primary,
                 leadingSpacing = dimenSmall,
                 leadingIcon = {
                     DefaultText(
-                        text = stringResource(R.string.login_noHaveAccount),
+                        text = stringResource(R.string.register_youHaveAccount),
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
@@ -321,8 +291,11 @@ fun LoginScreen(
                     UIState.Error(error = LoginErrorType.INVALID_lOGIN) -> {
                         stringResource(R.string.login_loginUnknowErrorMessage)
                     }
+                    UIState.Error(error = LoginErrorType.PASSWORD_NOT_MATCH) -> {
+                        stringResource(R.string.register_passwordNotMatching)
+                    }
                     else -> {
-                        stringResource(R.string.login_loginUnknowErrorMessage)
+                        stringResource(R.string.register_registerUnknowErrorMessage)
                     }
                 },
                 leadingContent = {
@@ -344,6 +317,6 @@ fun LoginScreen(
 @Composable
 fun PreviewLogin() {
     MNotesTheme {
-        LoginScreen()
+        RegisterScreen()
     }
 }

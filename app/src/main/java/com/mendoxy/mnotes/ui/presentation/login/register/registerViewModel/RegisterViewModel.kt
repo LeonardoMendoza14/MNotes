@@ -1,6 +1,7 @@
-package com.mendoxy.mnotes.ui.presentation.login.loginViewModel
+package com.mendoxy.mnotes.ui.presentation.login.register.registerViewModel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,81 +17,65 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
+class RegisterViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase
 ) : ViewModel() {
 
-    private val _loginState = MutableStateFlow<LoginUiState>(LoginUiState())
-    val loginState: MutableStateFlow<LoginUiState> = _loginState
+    private val _registerState = MutableStateFlow<LoginUiState>(LoginUiState())
+    val registerState: MutableStateFlow<LoginUiState> = _registerState
+
+    private val _confirmPassword = mutableStateOf("")
+    val confirmPassword = _confirmPassword
 
 
     fun setEmail(email:String){
-        _loginState.update{state ->
+        _registerState.update{state ->
             state.copy(email = email)
         }
     }
 
     fun setPassword(password:String){
-        _loginState.update{state ->
+        _registerState.update{state ->
             state.copy(password = password)
         }
     }
 
+    fun setConfirmPassword(confirm: String){
+        _confirmPassword.value = confirm
+    }
+
     fun setShowPassword(){
-        _loginState.update{state ->
+        _registerState.update{state ->
             state.copy(showPassword = !state.showPassword)
         }
     }
 
     fun resetError(){
-        _loginState.update { state ->
+        _registerState.update { state ->
             state.copy(
                 loginState = UIState.Idle
             )
         }
     }
 
-    fun login(){
-        _loginState.update{state ->
+    fun register(){
+        _registerState.update{state ->
             state.copy(loginState = UIState.Loading)
         }
         viewModelScope.launch {
-            val loginResult = loginUseCase.login(_loginState.value.email, _loginState.value.password)
+            val loginResult = loginUseCase.createUser(_registerState.value.email, _registerState.value.password, _confirmPassword.value)
             when(loginResult){
                 LoginErrorType.NONE -> {
-                    _loginState.update { state ->
+                    _registerState.update { state ->
                         state.copy(loginState = UIState.Success(Unit))
-                     }
+                    }
                 }
                 else -> {
-                    _loginState.update { state ->
+                    _registerState.update { state ->
                         state.copy(loginState = UIState.Error(loginResult))
                     }
                 }
             }
         }
     }
-
-    fun loginWithGoogle(idToken: String) {
-        viewModelScope.launch {
-            _loginState.update {state ->
-                state.copy(loginState = UIState.Loading)
-            }
-
-            val result = loginUseCase.loginWithGoogle(idToken)
-            when(result){
-                LoginErrorType.NONE -> {
-                    _loginState.update { state ->
-                        state.copy(loginState = UIState.Success(Unit))
-                    }
-                }
-                else -> {
-                    _loginState.update { state ->
-                        state.copy(loginState = UIState.Error(result))
-                    }
-                }
-            }
-        }
-    }
-
 }

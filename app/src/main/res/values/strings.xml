@@ -23,4 +23,5 @@
     <string name="register_youHaveAccount">¿Ya tienes cuenta?</string>
     <string name="register_passwordNotMatching">Las contraseñas no coinciden</string>
     <string name="register_registerUnknowErrorMessage">Tuvimos problemas para crear tu cuenta</string>
+    <string name="register_invalidRegister">Ya existe una cuenta con este usuario</string>
 </resources>

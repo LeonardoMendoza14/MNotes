@@ -68,6 +68,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.mendoxy.mnotes.navigation.AppRoutes
 import com.mendoxy.mnotes.ui.presentation.components.ErrorMessageCard
 import com.mendoxy.mnotes.ui.presentation.login.register.registerViewModel.RegisterViewModel
 import com.mendoxy.mnotes.ui.utils.LoginErrorType
@@ -108,7 +109,9 @@ fun RegisterScreen(
 //    }
 
     if(state.loginState is UIState.Success){
-        // Navegar a la pantalla principal
+        navController.navigate(AppRoutes.Home.route){
+            popUpTo(AppRoutes.Register.route){inclusive = true}
+        }
     }
 
     Box(
@@ -244,7 +247,10 @@ fun RegisterScreen(
             DefaultText(
                 modifier = Modifier
                     .clickable {
-
+                        navController.navigate(AppRoutes.Login.route){
+                            popUpTo(AppRoutes.Register.route){inclusive = true}
+                            launchSingleTop = true
+                        }
                     },
                 text = stringResource(R.string.register_alreadyAccount),
                 color = MaterialTheme.colorScheme.primary,
@@ -292,7 +298,7 @@ fun RegisterScreen(
                         stringResource(R.string.login_passwordErrorMessage)
                     }
                     UIState.Error(error = LoginErrorType.INVALID_lOGIN) -> {
-                        stringResource(R.string.login_loginUnknowErrorMessage)
+                        stringResource(R.string.register_invalidRegister)
                     }
                     UIState.Error(error = LoginErrorType.PASSWORD_NOT_MATCH) -> {
                         stringResource(R.string.register_passwordNotMatching)

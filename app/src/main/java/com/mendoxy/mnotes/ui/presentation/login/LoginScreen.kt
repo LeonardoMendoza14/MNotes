@@ -107,7 +107,9 @@ fun LoginScreen(
 //    }
 
     if(state.loginState is UIState.Success){
-        navController.navigate(route = AppRoutes.Login.route)
+        navController.navigate(route = AppRoutes.Home.route){
+            popUpTo(AppRoutes.Login.route){inclusive = true}
+        }
     }
 
     Box(
@@ -275,7 +277,12 @@ fun LoginScreen(
             DefaultText(
                 modifier = Modifier
                     .clickable {
-                        navController.navigate(AppRoutes.Register.route)
+                        navController.navigate(AppRoutes.Register.route){
+                            popUpTo(AppRoutes.Login.route){
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
                     },
                 text = stringResource(R.string.login_newAccount),
                 color = MaterialTheme.colorScheme.primary,

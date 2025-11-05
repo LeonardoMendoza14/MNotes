@@ -10,6 +10,7 @@ val tertiaryDark = Color(0xFF52525C)
 val backgroundDark = Color(0xFF09090B)
 val surfaceDark = Color(0xFF18181B)
 val onSurfaceDark = Color(0xFF52525C)
+val outlineDark = Color(0xFF27272A)
 
 // Light Theme
 //val primaryLight = Color(0xFF)

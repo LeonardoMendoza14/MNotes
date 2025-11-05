@@ -79,7 +79,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun RegisterScreen(
     navController: NavHostController,
-    vm: RegisterViewModel = hiltViewModel()
+    vm: RegisterViewModel = hiltViewModel(),
+    onRegisterClick: () -> Unit = {}
 ) {
     val state: LoginUiState by vm.registerState.collectAsState()
     val confirmPassword by vm.confirmPassword
@@ -107,12 +108,6 @@ fun RegisterScreen(
 //            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
 //        }
 //    }
-
-    if(state.loginState is UIState.Success){
-        navController.navigate(AppRoutes.Home.route){
-            popUpTo(AppRoutes.Register.route){inclusive = true}
-        }
-    }
 
     Box(
         modifier = Modifier
@@ -318,6 +313,16 @@ fun RegisterScreen(
 
 
         }
+
+        LaunchedEffect(state.loginState) {
+            if (state.loginState is UIState.Success) {
+                navController.navigate(AppRoutes.Home.route) {
+                    popUpTo(AppRoutes.Login.route) { inclusive = true }
+                    launchSingleTop = true
+                }
+            }
+        }
+
 
     }
 }

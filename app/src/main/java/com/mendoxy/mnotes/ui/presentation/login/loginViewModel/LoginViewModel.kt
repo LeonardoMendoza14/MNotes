@@ -24,25 +24,25 @@ class LoginViewModel @Inject constructor(
     val loginState: MutableStateFlow<LoginUiState> = _loginState
 
 
-    fun setEmail(email:String){
-        _loginState.update{state ->
+    fun setEmail(email: String) {
+        _loginState.update { state ->
             state.copy(email = email)
         }
     }
 
-    fun setPassword(password:String){
-        _loginState.update{state ->
+    fun setPassword(password: String) {
+        _loginState.update { state ->
             state.copy(password = password)
         }
     }
 
-    fun setShowPassword(){
-        _loginState.update{state ->
+    fun setShowPassword() {
+        _loginState.update { state ->
             state.copy(showPassword = !state.showPassword)
         }
     }
 
-    fun resetError(){
+    fun resetError() {
         _loginState.update { state ->
             state.copy(
                 loginState = UIState.Idle
@@ -50,18 +50,20 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun login(){
-        _loginState.update{state ->
+    fun login(): Boolean {
+        _loginState.update { state ->
             state.copy(loginState = UIState.Loading)
         }
         viewModelScope.launch {
-            val loginResult = loginUseCase.login(_loginState.value.email, _loginState.value.password)
-            when(loginResult){
+            val loginResult =
+                loginUseCase.login(_loginState.value.email, _loginState.value.password)
+            when (loginResult) {
                 LoginErrorType.NONE -> {
                     _loginState.update { state ->
                         state.copy(loginState = UIState.Success(Unit))
-                     }
+                    }
                 }
+
                 else -> {
                     _loginState.update { state ->
                         state.copy(loginState = UIState.Error(loginResult))
@@ -69,6 +71,10 @@ class LoginViewModel @Inject constructor(
                 }
             }
         }
+        if (_loginState.value.loginState is UIState.Success) {
+            return true
+        }
+        return false
     }
 
     fun loginWithGoogle(idToken: String) {

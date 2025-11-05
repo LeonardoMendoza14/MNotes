@@ -42,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
@@ -106,11 +107,20 @@ fun LoginScreen(
 //        }
 //    }
 
-    if(state.loginState is UIState.Success){
-        navController.navigate(route = AppRoutes.Home.route){
-            popUpTo(AppRoutes.Login.route){inclusive = true}
-        }
-    }
+
+//    // Esto tarda 2 clicks en login para pasar a la pantalla
+//    LaunchedEffect(state.loginState is UIState.Success){
+//            navController.navigate(route = AppRoutes.Home.route){
+//                popUpTo(AppRoutes.Login.route){inclusive = true}
+//            }
+//    }
+//
+//    // Esto hace un bug raro en el que tarda en cambiar de pantalla
+//    if(state.loginState is UIState.Success){
+//        navController.navigate(route = AppRoutes.Home.route){
+//            popUpTo(AppRoutes.Login.route){inclusive = true}
+//        }
+//    }
 
     Box(
         modifier = Modifier
@@ -251,8 +261,6 @@ fun LoginScreen(
             Button(
                 onClick = {
                     vm.login()
-                    Log.e("Debug", showError.toString())
-                    Log.e("Debug", state.loginState.toString())
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -347,6 +355,17 @@ fun LoginScreen(
 
 
         }
+
+        LaunchedEffect(state.loginState) {
+            if (state.loginState is UIState.Success) {
+                navController.navigate(AppRoutes.Home.route) {
+                    popUpTo(AppRoutes.Login.route) { inclusive = true }
+                    launchSingleTop = true
+                }
+            }
+        }
+
+
 
     }
 }

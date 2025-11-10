@@ -102,10 +102,77 @@ fun LoginTextField(
     }
 }
 
+@Composable
+fun DefaultTextField(
+    modifier: Modifier = Modifier,
+    label: String = "Label",
+    fieldModifier: Modifier = Modifier,
+    value: String = "",
+    onValueChange: (String) -> Unit = {},
+    enabled: Boolean = true,
+    placeholder: String = "Placeholder",
+    leadingIcon: (@Composable () -> Unit)? = null,
+    trailingIcon: (@Composable () -> Unit)? = null,
+    isError: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface
+){
+
+    var isFocused by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.background(backgroundColor)) {
+        DefaultText(
+            text = label,
+            modifier = modifier,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(Modifier.height(dimenMiddle))
+
+        TextField(
+            value = value,
+            onValueChange = {onValueChange(it)},
+            modifier = fieldModifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .border(width = 1.dp, color =if(!isFocused) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary, shape = MaterialTheme.shapes.medium)
+                .align(Alignment.Start)
+                .onFocusChanged{focusState ->
+                    isFocused = focusState.isFocused
+                }
+            ,
+            enabled = enabled,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            placeholder = {
+                DefaultText(
+                    text = placeholder,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            },
+            leadingIcon = leadingIcon?.let { leadingIcon },
+            trailingIcon = trailingIcon?.let {trailingIcon },
+            isError = isError,
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            singleLine = true,
+            shape = MaterialTheme.shapes.medium,
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = MaterialTheme.colorScheme.primary,
+                unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+
+            )
+        )
+
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun Preview(){
     MNotesTheme {
-        LoginTextField()
+        DefaultTextField()
     }
 }

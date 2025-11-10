@@ -1,17 +1,17 @@
 package com.mendoxy.mnotes.ui.utils
 
-sealed class UIState {
-    data object Idle: UIState()
-    data object Loading: UIState()
-    data class Error(val error: Any): UIState()
-    data class Success(val message: Any): UIState()
+sealed class UiState {
+    data object Idle: UiState()
+    data object Loading: UiState()
+    data class Error(val error: Any): UiState()
+    data class Success(val message: Any): UiState()
 }
 
 data class LoginUiState(
     val email: String = "",
     val password: String = "",
     val showPassword: Boolean = false,
-    val loginState: UIState = UIState.Idle
+    val loginState: UiState = UiState.Idle
 )
 
 enum class LoginErrorType{

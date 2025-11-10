@@ -22,11 +22,13 @@ fun DefaultText(
     text: String,
     isTitle: Boolean = false,
     color: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    containerModifier: Modifier = Modifier
 ){
     Row(
+        modifier = containerModifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Start
     ) {
         leadingIcon?.let { leadingIcon() }
 

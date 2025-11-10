@@ -1,7 +1,13 @@
 package com.mendoxy.mnotes.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,21 +32,55 @@ fun AppNavigation(navController: NavHostController){
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        enterTransition = {fadeIn()},
-        exitTransition = { fadeOut() }
+        enterTransition = {
+            fadeIn()
+        }
     ) {
+        composable(
+            route = AppRoutes.Login.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    tween(1000)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    tween(1000)
+                )
+            }
+        ) { LoginScreen(navController) }
 
-        composable(route = AppRoutes.Login.route){
-            LoginScreen(navController)
-        }
+        composable(
+            AppRoutes.Register.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    tween(1000)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    tween(1000)
+                )
+            }
+        ) { RegisterScreen(navController) }
 
-        composable(route = AppRoutes.Register.route){
-            RegisterScreen(navController)
-        }
-
-        composable(route = AppRoutes.Home.route){
-            HomeScreen(navController)
-        }
-
+        composable(
+            AppRoutes.Home.route,
+            enterTransition = {
+                fadeIn()
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    tween(1000)
+                )
+            }
+        ) { HomeScreen(navController) }
     }
+
+
 }

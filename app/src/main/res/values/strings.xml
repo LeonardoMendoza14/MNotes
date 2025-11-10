@@ -2,7 +2,7 @@
     <string name="app_name">MNotes</string>
     <string name="login_message">Inicia sesión para continuar</string>
     <string name="login_emailField">Ingresa tu usuario</string>
-    <string name="login_userLabel">User</string>
+    <string name="login_userLabel">Usuario</string>
     <string name="login_passwordLabel">Contraseña</string>
     <string name="login_userPlaceholder">Ingresa tu usuario</string>
     <string name="login_passwordPlaceholder">Ingresa tu contraseña</string>
@@ -24,4 +24,10 @@
     <string name="register_passwordNotMatching">Las contraseñas no coinciden</string>
     <string name="register_registerUnknowErrorMessage">Tuvimos problemas para crear tu cuenta</string>
     <string name="register_invalidRegister">Ya existe una cuenta con este usuario</string>
+    <string name="home_createNote">Crear nota</string>
+    <string name="home_editNote">Editar nota</string>
+    <string name="home_notes">Notas</string>
+    <string name="note_isToday">Hoy</string>
+    <string name="home_save">Guardar</string>
+    <string name="home_update">Actualizar</string>
 </resources>

@@ -1,11 +1,8 @@
 package com.mendoxy.mnotes.domain.useCase
 
 import android.util.Patterns
-import com.google.android.gms.common.api.Response
 import com.mendoxy.mnotes.domain.repository.FirebaseAuthRepository
 import com.mendoxy.mnotes.ui.utils.LoginErrorType
-import com.mendoxy.mnotes.ui.utils.UIState
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(

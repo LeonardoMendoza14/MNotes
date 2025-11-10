@@ -1,15 +1,12 @@
 package com.mendoxy.mnotes.ui.presentation.login.register.registerViewModel
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mendoxy.mnotes.R
 import com.mendoxy.mnotes.domain.useCase.LoginUseCase
 import com.mendoxy.mnotes.ui.utils.LoginErrorType
 import com.mendoxy.mnotes.ui.utils.LoginUiState
-import com.mendoxy.mnotes.ui.utils.UIState
+import com.mendoxy.mnotes.ui.utils.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -53,26 +50,26 @@ class RegisterViewModel @Inject constructor(
     fun resetError(){
         _registerState.update { state ->
             state.copy(
-                loginState = UIState.Idle
+                loginState = UiState.Idle
             )
         }
     }
 
     fun register(){
         _registerState.update{state ->
-            state.copy(loginState = UIState.Loading)
+            state.copy(loginState = UiState.Loading)
         }
         viewModelScope.launch {
             val loginResult = loginUseCase.createUser(_registerState.value.email, _registerState.value.password, _confirmPassword.value)
             when(loginResult){
                 LoginErrorType.NONE -> {
                     _registerState.update { state ->
-                        state.copy(loginState = UIState.Success(Unit))
+                        state.copy(loginState = UiState.Success(Unit))
                     }
                 }
                 else -> {
                     _registerState.update { state ->
-                        state.copy(loginState = UIState.Error(loginResult))
+                        state.copy(loginState = UiState.Error(loginResult))
                     }
                 }
             }

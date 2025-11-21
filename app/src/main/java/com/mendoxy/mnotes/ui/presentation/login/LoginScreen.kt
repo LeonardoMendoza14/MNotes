@@ -52,6 +52,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.mendoxy.mnotes.navigation.AppRoutes
+import com.mendoxy.mnotes.ui.presentation.components.DefaultButton
 import com.mendoxy.mnotes.ui.presentation.components.ErrorMessageCard
 import com.mendoxy.mnotes.ui.utils.LoginErrorType
 import com.mendoxy.mnotes.ui.utils.LoginUiState
@@ -242,14 +243,10 @@ fun LoginScreen(
 
             Spacer(Modifier.height(dimenLarge))
 
-            Button(
+            DefaultButton(
                 onClick = {
                     vm.login()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(height = dimenButton),
-                shape = MaterialTheme.shapes.medium,
+                }
             ) {
                 if(state.loginState != UiState.Loading) {
                     DefaultText(

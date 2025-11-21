@@ -23,12 +23,13 @@ fun DefaultText(
     isTitle: Boolean = false,
     color: Color,
     modifier: Modifier = Modifier,
-    containerModifier: Modifier = Modifier
+    containerModifier: Modifier = Modifier,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start
 ){
     Row(
         modifier = containerModifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
+        horizontalArrangement = horizontalArrangement
     ) {
         leadingIcon?.let { leadingIcon() }
 

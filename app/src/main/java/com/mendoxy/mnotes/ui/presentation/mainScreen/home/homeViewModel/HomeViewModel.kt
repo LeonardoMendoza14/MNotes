@@ -39,8 +39,8 @@ class HomeViewModel @Inject constructor(
     val notes: StateFlow<List<NoteModel>> = _notes
 
     val notesCounter: StateFlow<Int> = _notes
-        .map { it.size }                     // Calcula el tamaño de la lista
-        .stateIn(                            // Lo convierte en un StateFlow
+        .map { it.size }
+        .stateIn(
             viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = 0

@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             navController = rememberNavController()
-            MNotesTheme {
+            MNotesTheme() {
                 AppNavigation(navController)
             }
         }

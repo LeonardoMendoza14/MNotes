@@ -30,4 +30,11 @@
     <string name="note_isToday">Hoy</string>
     <string name="home_save">Guardar</string>
     <string name="home_update">Actualizar</string>
+    <string name="homeConfig_Title">Configuración</string>
+    <string name="homeConfig_themeTitle">Tema</string>
+    <string name="homeConfig_themeLight">Claro</string>
+    <string name="homeConfig_themeDark">Oscuro</string>
+    <string name="homeConfig_fontSizeTitle">Tamaño de fuente</string>
+    <string name="homeConfig_orderTitle">Ordenar notas por</string>
+    <string name="homeConfig_logOut">Cerrar sesión</string>
 </resources>

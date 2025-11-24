@@ -1,13 +1,9 @@
 package com.mendoxy.mnotes.ui.presentation.mainScreen.home
 
-import android.provider.Settings
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.rememberScrollState
@@ -26,14 +22,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,8 +40,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -62,9 +53,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -72,27 +60,27 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.google.firebase.Firebase
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 import com.mendoxy.mnotes.R
 import com.mendoxy.mnotes.domain.model.NoteModel
 import com.mendoxy.mnotes.navigation.AppRoutes
+import com.mendoxy.mnotes.ui.presentation.SettingsEvent
+import com.mendoxy.mnotes.ui.presentation.SettingsViewModel
+import com.mendoxy.mnotes.ui.presentation.components.DefaultButton
 import com.mendoxy.mnotes.ui.presentation.components.DefaultText
-import com.mendoxy.mnotes.ui.presentation.components.DefaultTextField
-import com.mendoxy.mnotes.ui.presentation.components.LoginTextField
 import com.mendoxy.mnotes.ui.presentation.components.NoteCard
-import com.mendoxy.mnotes.ui.presentation.mainScreen.home.HomeBottomSheet.NoteBottomSheetContent
 import com.mendoxy.mnotes.ui.presentation.mainScreen.home.homeViewModel.HomeViewModel
 import com.mendoxy.mnotes.ui.theme.MNotesTheme
 import com.mendoxy.mnotes.ui.theme.dimenBig
 import com.mendoxy.mnotes.ui.theme.dimenButton
+import com.mendoxy.mnotes.ui.theme.dimenExtraHuge
 import com.mendoxy.mnotes.ui.theme.dimenExtraLarge
 import com.mendoxy.mnotes.ui.theme.dimenHuge
 import com.mendoxy.mnotes.ui.theme.dimenLarge
 import com.mendoxy.mnotes.ui.theme.dimenMiddle
 import com.mendoxy.mnotes.ui.theme.dimenSmall
+import com.mendoxy.mnotes.ui.utils.AppFontSize
+import com.mendoxy.mnotes.ui.utils.AppTheme
+import com.mendoxy.mnotes.ui.utils.SortOrder
 import com.mendoxy.mnotes.ui.utils.format
 import com.mendoxy.mnotes.ui.utils.isToday
 
@@ -100,7 +88,8 @@ import com.mendoxy.mnotes.ui.utils.isToday
 @Composable
 fun HomeScreen(
     navController: NavHostController,
-    vm: HomeViewModel = hiltViewModel()
+    vm: HomeViewModel = hiltViewModel(),
+    svm: SettingsViewModel = hiltViewModel()
 ) {
 
     val notesCounter = vm.notesCounter.collectAsState().value
@@ -108,6 +97,7 @@ fun HomeScreen(
     val notes = vm.notes.collectAsState().value
     val uiState = vm.uiState.value
     val isUserLoggedIn by vm.isUserLoggedIn.collectAsState()
+    val settingsState by svm.settingsState.collectAsState()
 
     LaunchedEffect(isUserLoggedIn) {
         if (!isUserLoggedIn) {
@@ -229,9 +219,21 @@ fun HomeScreen(
                     containerColor = MaterialTheme.colorScheme.surface
                 ) {
                     HomeBottomSheet.ConfigBottomSheetContent(
+                        currentTheme = settingsState.appTheme,
+                        currentFontSize = settingsState.fontSize,
+                        currentOrder = settingsState.order,
+                        onSaveClick = {
+                            svm.onEvent(SettingsEvent.SavePreferences)
+                        },
                         onLogOutClick = {
                             showConfigBottomSheet = false
                             vm.logOut()
+                        },
+                        onChangeTheme = { newTheme ->
+                            svm.onEvent(SettingsEvent.ChangeTheme(newTheme))
+                        },
+                        onChangeFontSize = { newFontSize ->
+                            svm.onEvent(SettingsEvent.ChangeFontSize(newFontSize))
                         }
                     )
                 }
@@ -370,7 +372,13 @@ private object HomeBottomSheet {
     @Composable
     fun ConfigBottomSheetContent(
         modifier: Modifier = Modifier,
-        onLoginSaveClick: () -> Unit = {},
+        currentTheme: AppTheme = AppTheme.DARK,
+        currentOrder: SortOrder = SortOrder.DESCENDING,
+        currentFontSize: AppFontSize = AppFontSize.MIDDLE,
+        onChangeTheme: (AppTheme) -> Unit = {},
+        onChangeFontSize: (AppFontSize) -> Unit = {},
+        onChangeOrder: (SortOrder) -> Unit = {},
+        onSaveClick: () -> Unit = {},
         onLogOutClick: () -> Unit = {}
     ) {
         Box(
@@ -414,17 +422,25 @@ private object HomeBottomSheet {
                     ) {
                         ConfigSheetComponents.ThemeCard(
                             modifier = Modifier.weight(1f),
+                            isSelected = currentTheme == AppTheme.LIGHT,
                             text = stringResource(R.string.homeConfig_themeLight),
                             icon = painterResource(R.drawable.ic_lightheme),
-                            iconColor = MaterialTheme.colorScheme.onSurface
+                            iconColor = MaterialTheme.colorScheme.primary,
+                            onClick = {
+                                onChangeTheme(AppTheme.LIGHT)
+                            }
                         )
                         Spacer(Modifier.width(dimenBig))
 
                         ConfigSheetComponents.ThemeCard(
                             modifier = Modifier.weight(1f),
+                            isSelected = currentTheme == AppTheme.DARK,
                             text = stringResource(R.string.homeConfig_themeDark),
                             icon = painterResource(R.drawable.ic_darktheme),
-                            iconColor = MaterialTheme.colorScheme.onSurface
+                            iconColor = MaterialTheme.colorScheme.primary,
+                            onClick = {
+                                onChangeTheme(AppTheme.DARK)
+                            }
                         )
                     }
 
@@ -448,7 +464,16 @@ private object HomeBottomSheet {
 
                     Spacer(Modifier.height(dimenLarge))
 
-                    ConfigSheetComponents.DropdownSelector()
+                    ConfigSheetComponents.DropdownSelector(
+                        selected = currentFontSize.ordinal,
+                        options = listOf(
+                            stringResource(R.string.homeConfig_smallFont),
+                            stringResource(R.string.homeConfig_middleFont),
+                            stringResource(R.string.homeConfig_bigFont)),
+                        onChangeSelection = {index ->
+                            onChangeFontSize(AppFontSize.entries[index])
+                        }
+                    )
                 }
 
                 ConfigSheetComponents.DivisorLine()
@@ -469,16 +494,23 @@ private object HomeBottomSheet {
 
                     Spacer(Modifier.height(dimenLarge))
 
-                    ConfigSheetComponents.DropdownSelector()
+                    ConfigSheetComponents.DropdownSelector(
+                        selected = currentOrder.ordinal,
+                        options = listOf(
+                            stringResource(R.string.homeConfig_orderDesc),
+                            stringResource(R.string.homeConfig_orderAsc)),
+                        onChangeSelection = {index ->
+                            onChangeFontSize(AppFontSize.entries[index])
+                        }
+                    )
                 }
 
-                Spacer(Modifier.height(dimenBig))
+                Spacer(Modifier.height(dimenExtraHuge))
 
-                Button(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally),
+                DefaultButton(
+                    modifier = Modifier.fillMaxWidth().align(Alignment.CenterHorizontally),
                     onClick = {
-
+                        onSaveClick()
                     }
                 ) {
                     DefaultText(
@@ -517,7 +549,7 @@ private object ConfigSheetComponents {
         modifier: Modifier = Modifier,
         text: String,
         icon: Painter = painterResource(R.drawable.ic_lightheme),
-        iconColor: Color = MaterialTheme.colorScheme.onSurface,
+        iconColor: Color = MaterialTheme.colorScheme.primary,
         isSelected: Boolean = false,
         onClick: () -> Unit = {}
     ) {
@@ -529,10 +561,13 @@ private object ConfigSheetComponents {
                 .clip(MaterialTheme.shapes.small)
                 .border(
                     width = 1.dp,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                    color = if (isSelected) iconColor else MaterialTheme.colorScheme.onSurface,
                     shape = MaterialTheme.shapes.small
                 )
-                .background(color = MaterialTheme.colorScheme.background),
+                .background(color = MaterialTheme.colorScheme.background)
+                .clickable{
+                    onClick()
+                },
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -560,10 +595,12 @@ private object ConfigSheetComponents {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun DropdownSelector(
-        options: List<String> = listOf("Opción A", "Opción B", "Opción C")
+        selected: Int,
+        options: List<String> = listOf("Opción A", "Opción B", "Opción C"),
+        onChangeSelection: (Int) -> Unit
     ) {
         var expanded by remember { mutableStateOf(false) }
-        var selectedOption by remember { mutableStateOf(options[0]) }
+        var selectedOption by remember { mutableStateOf(options[selected]) }
 
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -596,20 +633,6 @@ private object ConfigSheetComponents {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             }
 
-
-            /*TextField(
-                value = selectedOption,
-                onValueChange = {},
-                readOnly = true, // MUY IMPORTANTE
-                label = { Text("Selecciona una opción") },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                },
-                modifier = Modifier
-                    .menuAnchor() // NECESARIO para posicionar el menú
-                    .fillMaxWidth()
-            )*/
-
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
@@ -623,6 +646,7 @@ private object ConfigSheetComponents {
                             )
                         },
                         onClick = {
+                            onChangeSelection(options.indexOf(option))
                             selectedOption = option
                             expanded = false
                         }

@@ -37,4 +37,9 @@
     <string name="homeConfig_fontSizeTitle">Tamaño de fuente</string>
     <string name="homeConfig_orderTitle">Ordenar notas por</string>
     <string name="homeConfig_logOut">Cerrar sesión</string>
+    <string name="homeConfig_smallFont">Pequeña</string>
+    <string name="homeConfig_middleFont">Mediana</string>
+    <string name="homeConfig_bigFont">Grande</string>
+    <string name="homeConfig_orderDesc">Descendente</string>
+    <string name="homeConfig_orderAsc">Ascendiente</string>
 </resources>

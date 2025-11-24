@@ -21,3 +21,19 @@ enum class LoginErrorType{
     INVALID_lOGIN,
     NONE
 }
+
+enum class AppTheme{
+    LIGHT,
+    DARK
+}
+
+enum class AppFontSize(val scaleFactor: Float){
+    SMALL(0.85f),
+    MIDDLE(1.0f),
+    BIG(1.15f)
+}
+
+enum class SortOrder{
+    DESCENDING,
+    ASCENDING
+}

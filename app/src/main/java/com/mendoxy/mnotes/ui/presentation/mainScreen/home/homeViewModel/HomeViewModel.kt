@@ -4,10 +4,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.Index
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.mendoxy.mnotes.domain.model.NoteModel
+import com.mendoxy.mnotes.domain.model.SettingsModel
 import com.mendoxy.mnotes.domain.useCase.NotesUseCase
+import com.mendoxy.mnotes.ui.utils.AppFontSize
+import com.mendoxy.mnotes.ui.utils.AppTheme
+import com.mendoxy.mnotes.ui.utils.SortOrder
 import com.mendoxy.mnotes.ui.utils.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.scopes.ViewModelScoped
@@ -15,8 +20,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,7 +32,9 @@ class HomeViewModel @Inject constructor(
     private val useCase: NotesUseCase,
     auth: FirebaseAuth
 ): ViewModel() {
+
     private val _currentUser = mutableStateOf(auth.currentUser)
+
     val currentUser = _currentUser
 
     private val _isUserLoggedIn = MutableStateFlow(useCase.isUserLoggedIn())

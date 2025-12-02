@@ -1,5 +1,6 @@
 package com.mendoxy.mnotes.ui.presentation.login
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -351,10 +352,3 @@ fun LoginScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewLogin() {
-    MNotesTheme {
-        LoginScreen(rememberNavController())
-    }
-}

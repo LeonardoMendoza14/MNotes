@@ -38,8 +38,8 @@ fun NoteCard(
     modifier: Modifier = Modifier,
     title: String = "Nota",
     date: String = "Hoy",
-    isSync: Boolean = false,
-    onSyncClick: () -> Unit = {},
+    isPinned: Boolean = false,
+    onPinClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
     content: (@Composable () -> Unit) = {
@@ -67,8 +67,8 @@ fun NoteCard(
         ) {
             Header.CardHeader(
                 title = title,
-                isSync = isSync,
-                onSyncClick = { onSyncClick() },
+                isPinned = isPinned,
+                onPinClick = { onPinClick() },
                 onDeleteClick = { onDeleteClick() },
                 onEditClick = { onEditClick() }
             )
@@ -88,8 +88,8 @@ private object Header {
     fun CardHeader(
         modifier: Modifier = Modifier,
         title: String,
-        isSync: Boolean,
-        onSyncClick: () -> Unit,
+        isPinned: Boolean,
+        onPinClick: () -> Unit,
         onDeleteClick: () -> Unit,
         onEditClick: () -> Unit
     ) {
@@ -107,9 +107,13 @@ private object Header {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
             ) {
-                if (isSync) {
+                if (isPinned) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_issync),
+                        modifier = Modifier
+                            .clickable {
+                                onPinClick()
+                            },
+                        painter = painterResource(R.drawable.ic_notpinned),
                         contentDescription = "",
                         tint = MaterialTheme.colorScheme.secondary
                     )
@@ -117,9 +121,9 @@ private object Header {
                     Icon(
                         modifier = Modifier
                             .clickable {
-                                onSyncClick()
+                                onPinClick()
                             },
-                        painter = painterResource(R.drawable.ic_notsync),
+                        painter = painterResource(R.drawable.ic_ispinned),
                         contentDescription = "",
                         tint = MaterialTheme.colorScheme.secondary
                     )
@@ -148,13 +152,5 @@ private object Header {
 
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun prevCard() {
-    MNotesTheme {
-        NoteCard()
     }
 }

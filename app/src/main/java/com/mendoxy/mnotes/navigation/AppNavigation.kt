@@ -1,5 +1,6 @@
 package com.mendoxy.mnotes.navigation
 
+import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -23,8 +24,10 @@ import com.mendoxy.mnotes.ui.presentation.mainScreen.home.HomeScreen
 @Composable
 fun AppNavigation(navController: NavHostController){
     val startDestination by remember {mutableStateOf(if(FirebaseAuth.getInstance().currentUser != null){
+        Log.e("DEBUG", "Entro a HomeDefault")
         AppRoutes.Home.route
     }else{
+        Log.e("DEBUG", "Entro a LoginDefault")
         AppRoutes.Login.route
     }
     )}

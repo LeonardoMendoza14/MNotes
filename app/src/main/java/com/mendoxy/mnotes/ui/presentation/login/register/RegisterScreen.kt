@@ -307,11 +307,3 @@ fun RegisterScreen(
 
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewLogin() {
-    MNotesTheme {
-        RegisterScreen(rememberNavController())
-    }
-}

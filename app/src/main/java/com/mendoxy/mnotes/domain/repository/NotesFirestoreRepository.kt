@@ -1,15 +1,17 @@
 package com.mendoxy.mnotes.domain.repository
 
+import com.google.firebase.firestore.Query.Direction
 import com.mendoxy.mnotes.domain.model.NoteModel
+import kotlinx.coroutines.flow.Flow
 
 interface NotesFirestoreRepository {
 
-    suspend fun getAllNotes(userId: String): Result<List<NoteModel>>
+    fun getAllNotes(userId: String): Flow<List<NoteModel>>
 
-    suspend fun createNote(userId: String, note: NoteModel): Result<Unit>
+    suspend fun createNote(userId: String, note: NoteModel)
 
-    suspend fun updateNote(userId: String, note: NoteModel): Result<Unit>
+    suspend fun updateNote(userId: String, note: NoteModel)
 
-    suspend fun deleteNote(userId: String, noteId: String): Result<Unit>
+    suspend fun deleteNote(userId: String, noteId: String)
 
 }

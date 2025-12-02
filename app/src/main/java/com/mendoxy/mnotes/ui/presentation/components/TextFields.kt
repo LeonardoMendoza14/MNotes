@@ -168,11 +168,3 @@ fun DefaultTextField(
 
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun Preview(){
-    MNotesTheme {
-        DefaultTextField()
-    }
-}

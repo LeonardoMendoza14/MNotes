@@ -47,11 +47,3 @@ fun ErrorMessageCard(
 
     }
 }
-
-@Preview(showBackground = true, backgroundColor = 0)
-@Composable
-fun PreivewScreen(){
-    MNotesTheme {
-        ErrorMessageCard()
-    }
-}

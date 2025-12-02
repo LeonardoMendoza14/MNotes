@@ -1,9 +1,11 @@
 package com.mendoxy.mnotes.ui.presentation.mainScreen.home
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.rememberScrollState
@@ -28,6 +30,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -53,13 +56,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.mendoxy.mnotes.R
 import com.mendoxy.mnotes.domain.model.NoteModel
 import com.mendoxy.mnotes.navigation.AppRoutes
@@ -68,8 +73,8 @@ import com.mendoxy.mnotes.ui.presentation.SettingsViewModel
 import com.mendoxy.mnotes.ui.presentation.components.DefaultButton
 import com.mendoxy.mnotes.ui.presentation.components.DefaultText
 import com.mendoxy.mnotes.ui.presentation.components.NoteCard
+import com.mendoxy.mnotes.ui.presentation.mainScreen.home.homeViewModel.HomeEvent
 import com.mendoxy.mnotes.ui.presentation.mainScreen.home.homeViewModel.HomeViewModel
-import com.mendoxy.mnotes.ui.theme.MNotesTheme
 import com.mendoxy.mnotes.ui.theme.dimenBig
 import com.mendoxy.mnotes.ui.theme.dimenButton
 import com.mendoxy.mnotes.ui.theme.dimenExtraHuge
@@ -89,18 +94,21 @@ import com.mendoxy.mnotes.ui.utils.isToday
 fun HomeScreen(
     navController: NavHostController,
     vm: HomeViewModel = hiltViewModel(),
-    svm: SettingsViewModel = hiltViewModel()
 ) {
-
-    val notesCounter = vm.notesCounter.collectAsState().value
-    val currentUser = vm.currentUser.value
-    val notes = vm.notes.collectAsState().value
-    val uiState = vm.uiState.value
-    val isUserLoggedIn by vm.isUserLoggedIn.collectAsState()
+    val activity = LocalContext.current as ComponentActivity
+    val svm: SettingsViewModel = hiltViewModel(viewModelStoreOwner = activity)
     val settingsState by svm.settingsState.collectAsState()
 
-    LaunchedEffect(isUserLoggedIn) {
-        if (!isUserLoggedIn) {
+    /**
+     * TODO: Deuda tecnica, deberia implementar un background por si no hay notas o no las ha cargado
+     */
+    val homeState by vm.homeState.collectAsState()
+
+    // 1. LÓGICA DE NAVEGACIÓN SEGURA
+    // Solo navegamos al Login si YA TERMINAMOS de cargar Y el resultado fue "No hay usuario".
+    LaunchedEffect(settingsState.userIsLogged, settingsState.isLoading) {
+        if (!settingsState.isLoading && !settingsState.userIsLogged) {
+            vm.closeListener()
             navController.navigate(AppRoutes.Login.route) {
                 popUpTo(0) { inclusive = true }
                 launchSingleTop = true
@@ -109,52 +117,49 @@ fun HomeScreen(
     }
 
     val configState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showConfigBottomSheet by remember { mutableStateOf(false) }
-
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showBottomSheet by remember { mutableStateOf(false) }
 
 
-    var selectedNote by remember { mutableStateOf<NoteModel?>(null) }
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            HomeTopBar.HomeTopBar(
-                counter = notesCounter,
-                onProfileClick = { showConfigBottomSheet = true })
-        },
+    if (!settingsState.isLoading) {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                HomeTopBar.HomeTopBar(
+                    counter = homeState.notesCounter,
+                    name = homeState.name,
+                    onProfileClick = { vm.onEvent(HomeEvent.ShowConfigSheet) })
+            },
 
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    selectedNote = null
-                    showBottomSheet = true
-                },
-                shape = CircleShape,
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = "",
-                    tint = MaterialTheme.colorScheme.background
-                )
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {
+                        vm.onEvent(HomeEvent.ShowNoteSheet())
+                    },
+                    shape = CircleShape,
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "",
+                        tint = MaterialTheme.colorScheme.background
+                    )
+                }
             }
-        }
-    ) { paddingValues ->
+        ) { paddingValues ->
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = dimenLarge),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(dimenMiddle),
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = dimenLarge),
+                contentAlignment = Alignment.TopCenter
             ) {
-                items(notes) { note ->
-                    if (!note.isDeleted) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(dimenMiddle),
+                ) {
+                    items(homeState.notes) { note ->
+
                         NoteCard(
                             title = note.title,
                             date = if (note.date.isToday()) {
@@ -162,16 +167,15 @@ fun HomeScreen(
                             } else {
                                 note.date.format()
                             },
-                            isSync = note.isSync,
-                            onSyncClick = {
-                                vm.syncNote(note)
+                            isPinned = note.pinned,
+                            onPinClick = {
+                                vm.onEvent(HomeEvent.PinNote(note))
                             },
                             onDeleteClick = {
-                                vm.deleteNote(currentUser!!.uid, note.idNote, note = note)
+                                vm.onEvent(HomeEvent.DeleteNote(note.idNote))
                             },
                             onEditClick = {
-                                selectedNote = note
-                                showBottomSheet = true
+                                vm.onEvent(HomeEvent.ShowNoteSheet(note = note))
                             }
                         ) {
                             DefaultText(
@@ -181,65 +185,69 @@ fun HomeScreen(
                         }
                     }
                 }
-            }
 
-            if (showBottomSheet) {
-                ModalBottomSheet(
-                    onDismissRequest = { showBottomSheet = false },
-                    sheetState = sheetState,
-                    containerColor = MaterialTheme.colorScheme.surface
-                ) {
+                if (homeState.showBottomSheet) {
+                    ModalBottomSheet(
+                        onDismissRequest = { vm.onEvent(HomeEvent.ShowNoteSheet()) },
+                        sheetState = sheetState,
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ) {
 
-                    HomeBottomSheet.NoteBottomSheetContent(
-                        note = selectedNote,
-                        onSave = { title, content ->
-                            if (selectedNote == null) {
-                                vm.addNote(
-                                    userId = currentUser!!.uid,
-                                    title = title,
-                                    content = content
-                                )
-                            } else {
-                                vm.updateNote(
-                                    note = selectedNote!!,
-                                    title = title,
-                                    content = content
-                                )
+                        HomeBottomSheet.NoteBottomSheetContent(
+                            note = homeState.selectedNoteForEdit,
+                            onSave = { title, content ->
+                                if (homeState.selectedNoteForEdit == null) {
+                                    vm.onEvent(HomeEvent.AddNote(title, content))
+                                } else {
+                                    vm.onEvent(HomeEvent.UpdateNote(note = homeState.selectedNoteForEdit!!, title, content))
+                                }
+                                vm.onEvent(HomeEvent.ShowNoteSheet())
                             }
-                            showBottomSheet = false
-                        }
-                    )
+                        )
+                    }
+                }
+
+                if (homeState.showConfigSheet) {
+                    ModalBottomSheet(
+                        onDismissRequest = { vm.onEvent(HomeEvent.ShowConfigSheet)},
+                        sheetState = configState,
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ) {
+                        HomeBottomSheet.ConfigBottomSheetContent(
+                            currentTheme = settingsState.appTheme,
+                            currentFontSize = settingsState.fontSize,
+                            currentOrder = settingsState.order,
+                            onSaveClick = {
+                                svm.onEvent(SettingsEvent.SavePreferences)
+                                vm.onEvent(HomeEvent.ShowConfigSheet)
+                            },
+                            onLogOutClick = {
+                                vm.onEvent(HomeEvent.ShowConfigSheet)
+                                svm.logOut()
+                            },
+                            onChangeTheme = { newTheme ->
+                                svm.onEvent(SettingsEvent.ChangeTheme(newTheme))
+                            },
+                            onChangeFontSize = { newFontSize ->
+                                svm.onEvent(SettingsEvent.ChangeFontSize(newFontSize))
+                            },
+                            onChangeOrder = { sortOrder ->
+                                svm.onEvent(SettingsEvent.ChangeSortOrder(sortOrder))
+                                vm.onEvent(HomeEvent.ChangeOrder(sortOrder))
+                            }
+                        )
+                    }
                 }
             }
 
-            if (showConfigBottomSheet) {
-                ModalBottomSheet(
-                    onDismissRequest = { showConfigBottomSheet = false },
-                    sheetState = configState,
-                    containerColor = MaterialTheme.colorScheme.surface
-                ) {
-                    HomeBottomSheet.ConfigBottomSheetContent(
-                        currentTheme = settingsState.appTheme,
-                        currentFontSize = settingsState.fontSize,
-                        currentOrder = settingsState.order,
-                        onSaveClick = {
-                            svm.onEvent(SettingsEvent.SavePreferences)
-                        },
-                        onLogOutClick = {
-                            showConfigBottomSheet = false
-                            vm.logOut()
-                        },
-                        onChangeTheme = { newTheme ->
-                            svm.onEvent(SettingsEvent.ChangeTheme(newTheme))
-                        },
-                        onChangeFontSize = { newFontSize ->
-                            svm.onEvent(SettingsEvent.ChangeFontSize(newFontSize))
-                        }
-                    )
-                }
-            }
         }
-
+    } else {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        }
     }
 }
 
@@ -248,6 +256,7 @@ private object HomeTopBar {
     @Composable
     fun HomeTopBar(
         counter: Int,
+        name: String,
         onProfileClick: () -> Unit = {}
     ) {
         Box(
@@ -274,12 +283,49 @@ private object HomeTopBar {
                         isTitle = true
                     )
 
-                    Image(
-                        painter = painterResource(R.drawable.ic_launcher_background),
-                        modifier = Modifier
+                    DefaultText(
+                        text = name, // Ejemplo: Juan Nieve
+                        color = MaterialTheme.colorScheme.primary,
+
+                        // 1. Quitamos los espaciadores por defecto para que no empujen el texto
+                        leadingSpacing = 0.dp,
+                        trailingSpacing = 0.dp,
+
+                        // 2. Centramos el contenido horizontalmente dentro del círculo
+                        horizontalArrangement = Arrangement.Center,
+
+                        // 3. Aplicamos la forma y tamaño al CONTENEDOR (Row), no al texto
+                        containerModifier = Modifier
+                            .size(40.dp) // El círculo contenedor mide 40dp
+                            .background(
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.surface
+                            )
+                            .clip(CircleShape)
                             .clickable {
                                 onProfileClick()
                             }
+                    )
+
+                    /*DefaultText(
+                        text = "A",
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.surface
+                            )
+                            .clip(shape = CircleShape)
+                            .clickable {
+                                onProfileClick()
+                            }
+                    )*/
+
+                    /*Image(
+                        painter = painterResource(R.drawable.ic_launcher_background),
+                        modifier = Modifier
+
                             .size(40.dp)
                             .background(
                                 shape = CircleShape,
@@ -287,7 +333,7 @@ private object HomeTopBar {
                             )
                             .clip(CircleShape),
                         contentDescription = ""
-                    )
+                    )*/
                 }
 
                 Column(
@@ -500,7 +546,7 @@ private object HomeBottomSheet {
                             stringResource(R.string.homeConfig_orderDesc),
                             stringResource(R.string.homeConfig_orderAsc)),
                         onChangeSelection = {index ->
-                            onChangeFontSize(AppFontSize.entries[index])
+                            onChangeOrder(SortOrder.entries[index])
                         }
                     )
                 }
@@ -508,14 +554,16 @@ private object HomeBottomSheet {
                 Spacer(Modifier.height(dimenExtraHuge))
 
                 DefaultButton(
-                    modifier = Modifier.fillMaxWidth().align(Alignment.CenterHorizontally),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally),
                     onClick = {
                         onSaveClick()
                     }
                 ) {
                     DefaultText(
                         text = stringResource(R.string.home_save),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.background
                     )
                 }
 
@@ -565,7 +613,7 @@ private object ConfigSheetComponents {
                     shape = MaterialTheme.shapes.small
                 )
                 .background(color = MaterialTheme.colorScheme.background)
-                .clickable{
+                .clickable {
                     onClick()
                 },
             contentAlignment = Alignment.Center
@@ -659,15 +707,10 @@ private object ConfigSheetComponents {
     @Composable
     fun DivisorLine(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(dimenBig))
-        Spacer(modifier = Modifier.height(3.dp).fillMaxWidth().background(color = MaterialTheme.colorScheme.outline))
+        Spacer(modifier = Modifier
+            .height(3.dp)
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.outline))
         Spacer(modifier = Modifier.height(dimenBig))
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewHomeScreen() {
-    MNotesTheme {
-        HomeScreen(rememberNavController())
     }
 }

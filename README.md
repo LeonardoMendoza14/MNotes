@@ -15,35 +15,35 @@ El objetivo de este proyecto fue resolver problemas complejos de ingeniería mó
 
 **1. Arquitectura Offline-First Real**
 
-La aplicación no requiere internet para funcionar. Utiliza la persistencia local de Firestore junto con Flow y addSnapshotListener para garantizar que el usuario siempre vea datos, sin importar la conectividad.
+- La aplicación no requiere internet para funcionar. Utiliza la persistencia local de Firestore junto con Flow y addSnapshotListener para garantizar que el usuario siempre vea datos, sin importar la conectividad.
 
-Sincronización Silenciosa: Los cambios locales se aplican instantáneamente (Optimistic UI) y se sincronizan en background cuando la red se recupera.
+- Sincronización Silenciosa: Los cambios locales se aplican instantáneamente (Optimistic UI) y se sincronizan en background cuando la red se recupera.
 
-Resolución de Conflictos: Implementación de estrategias de Merge para evitar sobrescritura de datos entre dispositivos.
+- Resolución de Conflictos: Implementación de estrategias de Merge para evitar sobrescritura de datos entre dispositivos.
 
 **2. Patrón Híbrido MVVM + MVI**
 
-Se utiliza la estructura de MVVM para la supervivencia del ciclo de vida, pero la comunicación con la UI sigue el patrón MVI (Model-View-Intent) estricto.
+- Se utiliza la estructura de MVVM para la supervivencia del ciclo de vida, pero la comunicación con la UI sigue el patrón MVI (Model-View-Intent) estricto.
 
-Estado Único (Single Source of Truth): HomeState y SettingsState son inmutables.
+- Estado Único (Single Source of Truth): HomeState y SettingsState son inmutables.
 
-Eventos: La UI no llama funciones, emite intenciones (HomeEvent.AddNote, SettingsEvent.ChangeTheme).
+- Eventos: La UI no llama funciones, emite intenciones (HomeEvent.AddNote, SettingsEvent.ChangeTheme).
 
-Beneficio: Elimina estados inconsistentes y hace que el flujo de datos sea unidireccional y fácil de testear.
+- Beneficio: Elimina estados inconsistentes y hace que el flujo de datos sea unidireccional y fácil de testear.
 
 **3. Manejo Avanzado de Concurrencia**
 
-Se pone especial énfasis en evitar Race Conditions y Crashes comunes en Android:
+- Se pone especial énfasis en evitar Race Conditions y Crashes comunes en Android:
 
-Logout Seguro: Implementación de cancelación síncrona de Jobs y Listeners antes de cerrar la sesión de Auth, evitando el error PERMISSION_DENIED común en Firestore.
+- Logout Seguro: Implementación de cancelación síncrona de Jobs y Listeners antes de cerrar la sesión de Auth, evitando el error PERMISSION_DENIED común en Firestore.
 
-Jobs Gestionados: Uso de Job manuales para cancelar suscripciones anteriores al cambiar de usuario o recargar configuraciones, evitando fugas de memoria y lecturas duplicadas.
+- Jobs Gestionados: Uso de Job manuales para cancelar suscripciones anteriores al cambiar de usuario o recargar configuraciones, evitando fugas de memoria y lecturas duplicadas.
 
 **4. Optimización de UI (Compose Performance)**
 
-Lambda Stability: Uso de remember { { ... } } para mantener la estabilidad de las lambdas y evitar recomposiciones innecesarias en componentes estáticos como TopBars y ListItems.
+- Lambda Stability: Uso de remember { { ... } } para mantener la estabilidad de las lambdas y evitar recomposiciones innecesarias en componentes estáticos como TopBars y ListItems.
 
-Listas Eficientes: LazyColumn optimizado con key y componentes ligeros.
+- Listas Eficientes: LazyColumn optimizado con key y componentes ligeros.
 
 ## Estructura del proyecto
 ```

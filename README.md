@@ -9,7 +9,7 @@
 
 El objetivo de este proyecto fue resolver problemas complejos de ingeniería móvil: Sincronización en tiempo real, persistencia offline, condiciones de carrera en concurrencia y optimización de recomposiciones en la UI.
 
-![Login](assets/screenshots/Login.png) ![Register](assets/screenshots/Register.png) ![Home](assets/screenshots/Home.png)
+<img src="assets/screnshots/Login.png" width="300px" /> <img src="assets/screnshots/Register.png" width="300px" /> <img src="assets/screnshots/Home.png" width="300px" /> <img src="assets/screnshots/CreateNote.png" width="300px" /> <img src="assets/screnshots/Notes.png" width="300px" /> <img src="assets/screnshots/LightTheme.png" width="300px" />
 
 ## Caracteristicas clave
 
